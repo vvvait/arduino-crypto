@@ -26,7 +26,7 @@
 #define AES_IV_SIZE             16
 #define AES_IV_LENGTH           16
 #define AES_128_KEY_LENGTH      16
-#define AES_256_KEY_LENGTH      16
+#define AES_256_KEY_LENGTH      32
 
 /**
  * Compute a SHA256 hash
@@ -183,7 +183,7 @@ class AES
          * @param size the size of the string
          * @return true if correct / false if not
          */
-        bool checkPad(uint8_t* in, int lsize);
+        bool checkPad(uint8_t* in, int lsize, int &insize);
 
     private:
         void encryptCBC(const uint8_t *in, uint8_t *out, int length);
@@ -197,7 +197,7 @@ class AES
         uint8_t _iv[AES_IV_SIZE];
         int _pad_size; // size of padding to add to plaintext
         int _size; // size of plaintext plus padding to be ciphered
-        uint8_t _arr_pad[15];
+        uint8_t _arr_pad[16];
 
         CIPHER_MODE _cipherMode;
 };
