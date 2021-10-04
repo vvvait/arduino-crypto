@@ -605,6 +605,7 @@ AES::AES(const uint8_t *key, const uint8_t *iv, AES_MODE mode, CIPHER_MODE ciphe
     _arr_pad[12] = 0x0d;
     _arr_pad[13] = 0x0e;
     _arr_pad[14] = 0x0f;
+    _arr_pad[15] = 0x10;
 
     switch (mode)
     {
@@ -691,7 +692,7 @@ void AES::setSize(int size)
 
 int AES::calcSizeAndPad(int in_size)
 {
-    in_size++; // +1 for null terminater on input string
+    // in_size++; // +1 for null terminater on input string
     int buf = round(in_size / AES_BLOCKSIZE) * AES_BLOCKSIZE;
     _size = (buf <= in_size) ? buf + AES_BLOCKSIZE : buf;
     _pad_size = _size - in_size;
@@ -707,23 +708,14 @@ void AES::padPlaintext(const uint8_t* in, uint8_t* out)
     }
 }
 
-bool AES::checkPad(uint8_t* in, int lsize)
+bool AES::checkPad(uint8_t* in, int lsize, int& insize)
 {
-    if (in[lsize-1] <= 0x0f)
-    {
-        int lpad = (int)in[lsize-1];
-        for (int i = lsize - 1; i >= lsize-lpad; i--)
-        {
-            if (_arr_pad[lpad - 1] != in[i])
-            {
-                return false;
-            }
-        }
-    } 
-    else 
-    {
-        return true;
-    }
+    if (in[lsize-1] > 0x10) return false;
+    int lpad = (int)in[lsize-1];
+    for (int i = lsize - 1; i >= lsize-lpad; i--)
+        if (_arr_pad[lpad - 1] != in[i])
+            return false;
+    insize = lsize - lpad;
     return true;
 }
 
